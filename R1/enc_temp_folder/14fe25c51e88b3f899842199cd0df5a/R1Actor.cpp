@@ -18,7 +18,6 @@ void AR1Actor::BeginPlay()
 
 	obj1 = NewObject<UR1Object>();// gc에서 관리
 
-	TObjectPtr<UR1Object> obj = NewObject<UR1Object>();
 }
 
 // Called every frame

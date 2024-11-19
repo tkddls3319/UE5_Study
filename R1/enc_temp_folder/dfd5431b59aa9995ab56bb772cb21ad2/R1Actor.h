@@ -26,6 +26,5 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 public:
-	UPROPERTY()
 	 UR1Object* obj1;
 };
