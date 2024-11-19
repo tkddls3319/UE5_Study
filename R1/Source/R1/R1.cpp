@@ -1,14 +1,14 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+ï»¿// Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "R1.h"
 #include "Modules/ModuleManager.h"
 #include "R1LogChannels.h"
-
 class FR1Module : public FDefaultGameModuleImpl
 {
 	virtual void StartupModule() override
 	{
-		UE_LOG(LogR1, Log, TEXT("StartupModule ½ÃÀÛ"));
+		//ì‹œìž‘
+		UE_LOG(LogR1, Log, TEXT("StartupModule ì‹œìž‘"));
 	}
 
 	virtual void ShutdownModule() override
