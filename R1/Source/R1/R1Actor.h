@@ -7,7 +7,7 @@
 #include "R1Actor.generated.h"
 
 class UR1Object;
-
+//class UStaticMeshComponent;
 UCLASS()
 class R1_API AR1Actor : public AActor
 {
@@ -27,14 +27,8 @@ public:
 
 public:
 
-	UPROPERTY(VisibleAnywhere)//VisibleAnywhere는 읽기전용으로 에디터 상에서 확인가능
-	 UR1Object* obj1;
+	UPROPERTY(VisibleAnywhere,BlueprintReadWrite)
+	TObjectPtr<UStaticMeshComponent> Box;
 
-	 UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "카테고리")
-	 int32 Hp = 100;
-	 UPROPERTY(VisibleAnywhere)
-	 int32 Mp = 200;
-	 UPROPERTY(VisibleAnywhere)
-	 float Speed = 3.5f;
 
 };
