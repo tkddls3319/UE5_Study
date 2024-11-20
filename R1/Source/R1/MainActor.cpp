@@ -10,8 +10,8 @@ AMainActor::AMainActor()
 	PrimaryActorTick.bCanEverTick = true;
 
 	ConstructorHelpers::FClassFinder<AR1Actor> FindClass(TEXT("/Script/Engine.Blueprint'/Game/_Sangin/BP_R1Actor.BP_R1Actor_C'"));
-	if(FindClass.Succeeded())
-	{ 
+	if (FindClass.Succeeded())
+	{
 		ActorClass = FindClass.Class;
 	}
 }
@@ -23,19 +23,19 @@ void AMainActor::BeginPlay()
 
 	FVector Location(0, 0, 0);
 	FRotator Rotation(0, 0, 0);
-	
-	
+
+
+	//c++로만든 actor 호출
 	{
-		//c++로만든 actor 호출
-	//Actor = GetWorld()->SpawnActor<AR1Actor>(Location, Rotation);
-	//Actor->SetLifeSpan(5.0f);//5초후 액터 제거
-	//GetWorld()->DestroyActor(Actor);//즉시 액터 제거
+		//Actor = GetWorld()->SpawnActor<AR1Actor>(Location, Rotation);
+		//Actor->SetLifeSpan(5.0f);//5초후 액터 제거
+		//GetWorld()->DestroyActor(Actor);//즉시 액터 제거
 	}
 
 	{
 		//ActorClass 생성
 		Actor = Cast<AR1Actor>(GetWorld()->SpawnActor(ActorClass));
-		Actor->SetLifeSpan(5.0f);//5초후 액터 제거
+		//Actor->SetLifeSpan(5.0f);//5초후 액터 제거
 	}
 }
 

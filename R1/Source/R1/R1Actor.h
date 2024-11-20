@@ -30,5 +30,6 @@ public:
 	UPROPERTY(VisibleAnywhere,BlueprintReadWrite)
 	TObjectPtr<UStaticMeshComponent> Box;
 
-
+	UPROPERTY(EditAnywhere, category = Battle)
+	TObjectPtr<class AActor> Target;
 };
