@@ -67,11 +67,11 @@ void AR1PlayerController::Input_Move(const FInputActionValue& InputValue)
 		FVector Direction = UKismetMathLibrary::GetRightVector(FRotator(0, Rotator.Yaw, 0));
 		GetPawn()->AddMovementInput(Direction, MovementVector.Y);
 	}
-
 }
 
 void AR1PlayerController::Input_Turn(const FInputActionValue& InputValue)
 {
 	float Val = InputValue.Get<float>();
 	AddYawInput(Val);//연구적으로 로테이션의 상태가 PlayerController에 보존된다.
+
 }
