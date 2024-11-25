@@ -7,4 +7,8 @@ namespace R1GameplayTags
 {
 	UE_DEFINE_GAMEPLAY_TAG(Input_Action_Move, "Input.Action.Move");
 	UE_DEFINE_GAMEPLAY_TAG(Input_Action_Turn, "Input.Action.Turn");
+
+	UE_DEFINE_GAMEPLAY_TAG(Test_String_Korea, "Test.String.Korea");
+	UE_DEFINE_GAMEPLAY_TAG(Test_String_English, "Test.String.English");
+
 }
