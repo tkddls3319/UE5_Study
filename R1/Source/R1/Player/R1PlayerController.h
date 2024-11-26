@@ -13,7 +13,7 @@ class R1_API AR1PlayerController : public APlayerController
 	GENERATED_BODY()
 	
 public:
-	AR1PlayerController(const FObjectInitializer& ObjectInitializer);
+	AR1PlayerController(const FObjectInitializer& ObjectInitializer );
 
 protected:
 	virtual void BeginPlay() override;
