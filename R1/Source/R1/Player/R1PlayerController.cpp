@@ -7,8 +7,8 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "System/R1AssetManager.h"
 #include "Data/R1InputData.h"
-#include "Data/R1LanguageData.h"
 #include "R1GameplayTags.h"
+#include <Character/R1Character.h>
 
 AR1PlayerController::AR1PlayerController(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -32,16 +32,6 @@ void AR1PlayerController::BeginPlay()
 			Subsystem->AddMappingContext(InputData->InputMappingContext, 0);
 		}
 	}
-
-	if (const UR1LanguageData* LanguageData = UR1AssetManager::GetAssetByName<UR1LanguageData>("LanguageData"))
-	{
-		TArray<FString> strings = LanguageData->FindFStringByTag(R1GameplayTags::Test_String_Korea);
-
-		for (const auto& item : strings)
-		{
-			UE_LOG(LogR1, Log, TEXT("%s"), *item);
-		}
-	}
 }
 
 void AR1PlayerController::SetupInputComponent()
@@ -57,16 +47,13 @@ void AR1PlayerController::SetupInputComponent()
 
 		auto Action2 = InputData->FindInputActionByTag(R1GameplayTags::Input_Action_Turn);
 		EnhancedInputComponent->BindAction(Action2, ETriggerEvent::Triggered, this, &ThisClass::Input_Turn);
+
+		auto Action3 = InputData->FindInputActionByTag(R1GameplayTags::Input_Action_Jump);
+		EnhancedInputComponent->BindAction(Action3, ETriggerEvent::Triggered, this, &ThisClass::Input_Jump);
+
+		auto Action4 = InputData->FindInputActionByTag(R1GameplayTags::Input_Action_Attack);
+		EnhancedInputComponent->BindAction(Action4, ETriggerEvent::Triggered, this, &ThisClass::Input_Attack);
 	}
-
-	//기존 블루프린터 방식
-	//if (auto* EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent))
-	//{
-	//	EnhancedInputComponent->BindAction(TestAction, ETriggerEvent::Triggered, this, &ThisClass::Input_Test);
-	//	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ThisClass::Input_Move);
-	//	EnhancedInputComponent->BindAction(TurnAction, ETriggerEvent::Triggered, this, &ThisClass::Input_Turn);
-	//}
-
 }
 
 void AR1PlayerController::Input_Move(const FInputActionValue& InputValue)
@@ -106,4 +93,18 @@ void AR1PlayerController::Input_Turn(const FInputActionValue& InputValue)
 	float Val = InputValue.Get<float>();
 	AddYawInput(Val);//연구적으로 로테이션의 상태가 PlayerController에 보존된다.
 
+}
+
+void AR1PlayerController::Input_Jump(const FInputActionValue& InputValue)
+{
+
+	if (AR1Character* MyPlayer = Cast<AR1Character>(GetPawn()))
+	{
+		MyPlayer->Jump();
+	}
+}
+
+void AR1PlayerController::Input_Attack(const FInputActionValue& InputValue)
+{
+	UE_LOG(LogR1, Log, TEXT("Input_Attack"));
 }
