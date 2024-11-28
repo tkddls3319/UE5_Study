@@ -8,11 +8,20 @@
 #include "System/R1AssetManager.h"
 #include "Data/R1InputData.h"
 #include "R1GameplayTags.h"
-#include <Character/R1Character.h>
+#include "Character/R1Player.h"
+#include "Blueprint/AIBlueprintHelperLibrary.h"
+#include "NiagaraSystem.h"
+#include "NiagaraFunctionLibrary.h"
 
 AR1PlayerController::AR1PlayerController(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
+#pragma region 마우스관련 초기화
+	bShowMouseCursor = true;
+	DefaultMouseCursor = EMouseCursor::Default;
+	CachedDestination = FVector::ZeroVector;
+	FollowTime = 0.f;
+#pragma endregion
 }
 
 void AR1PlayerController::BeginPlay()
@@ -27,7 +36,7 @@ void AR1PlayerController::BeginPlay()
 
 	if (const UR1InputData* InputData = UR1AssetManager::GetAssetByName<UR1InputData>("InputData"))
 	{
-		if(UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
+		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
 		{
 			Subsystem->AddMappingContext(InputData->InputMappingContext, 0);
 		}
@@ -42,74 +51,53 @@ void AR1PlayerController::SetupInputComponent()
 	{
 		UEnhancedInputComponent* EnhancedInputComponent = CastChecked< UEnhancedInputComponent>(InputComponent);
 
-		auto Action1 = InputData->FindInputActionByTag(R1GameplayTags::Input_Action_Move);
-		EnhancedInputComponent->BindAction(Action1, ETriggerEvent::Triggered, this, &ThisClass::Input_Move);
+		auto Action1 = InputData->FindInputActionByTag(R1GameplayTags::Input_Action_SetDestination);
 
-		auto Action2 = InputData->FindInputActionByTag(R1GameplayTags::Input_Action_Turn);
-		EnhancedInputComponent->BindAction(Action2, ETriggerEvent::Triggered, this, &ThisClass::Input_Turn);
-
-		auto Action3 = InputData->FindInputActionByTag(R1GameplayTags::Input_Action_Jump);
-		EnhancedInputComponent->BindAction(Action3, ETriggerEvent::Triggered, this, &ThisClass::Input_Jump);
-
-		auto Action4 = InputData->FindInputActionByTag(R1GameplayTags::Input_Action_Attack);
-		EnhancedInputComponent->BindAction(Action4, ETriggerEvent::Triggered, this, &ThisClass::Input_Attack);
+		EnhancedInputComponent->BindAction(Action1, ETriggerEvent::Started, this, &ThisClass::OnInputStarted);
+		EnhancedInputComponent->BindAction(Action1, ETriggerEvent::Triggered, this, &ThisClass::OnSetDestinationTriggered);
+		EnhancedInputComponent->BindAction(Action1, ETriggerEvent::Completed, this, &ThisClass::OnSetDestinationReleased);
+		EnhancedInputComponent->BindAction(Action1, ETriggerEvent::Canceled, this, &ThisClass::OnInputStarted);
 	}
 }
 
-void AR1PlayerController::Input_Move(const FInputActionValue& InputValue)
+void AR1PlayerController::OnInputStarted()
 {
-	FVector2D MovementVector = InputValue.Get<FVector2D>();
+	StopMovement();
+}
 
-	if (MovementVector.X != 0)
+void AR1PlayerController::OnSetDestinationTriggered()
+{
+	// We flag that the input is being pressed
+	FollowTime += GetWorld()->GetDeltaSeconds();
+
+	// We look for the location in the world where the player has pressed the input
+	FHitResult Hit;
+	bool bHitSuccessful = GetHitResultUnderCursor(ECollisionChannel::ECC_Visibility, true, OUT Hit);
+
+	// If we hit a surface, cache the location
+	if (bHitSuccessful)
 	{
-		//AddActorWorldOffset 해당버전은 직접적으로 월드좌표를 이용하여 움직인다. 이 때 대각선같은 부분에 대한 연산은 따로 만들어줘야한다.
-		/*FVector Direction = FVector::ForwardVector * MovementVector.X;
-		GetPawn()->AddActorWorldOffset(Direction * 50.0f);*/
-
-		/*
-		Unreal Engine에서 **AddMovementInput**와 Movement(정확히는 CharacterMovementComponent)는 서로 관련이 깊다.
-		AddMovementInput은 캐릭터의 입력을 처리하여 이동 방향을 설정하는 함수이고, 
-		이동은 **CharacterMovementComponent**가 실제로 처리합니다.
-		즉 AddMovementInput는 입력을 이동 방향 벡터로 변환하여 캐릭터의 이동 명령을 예약하는 함수입니다.
-		CharacterMovementComponent는 예약된 이동 명령을 처리하는 컴포넌트이다.
-		*/
-		FRotator Rotator = GetControlRotation();//PlayerController에 입력된 방향
-		FVector Direction = UKismetMathLibrary::GetForwardVector(FRotator(0, Rotator.Yaw, 0));
-		GetPawn()->AddMovementInput(Direction, MovementVector.X);
+		CachedDestination = Hit.Location;
 	}
-	if (MovementVector.Y != 0)
-	{
-	/*	FVector Direction = FVector::ForwardVector * MovementVector.Y;
-		GetPawn()->AddActorWorldOffset(Direction * 50.0f);*/
 
-		FRotator Rotator = GetControlRotation();
-		FVector Direction = UKismetMathLibrary::GetRightVector(FRotator(0, Rotator.Yaw, 0));
-		GetPawn()->AddMovementInput(Direction, MovementVector.Y);
+	// Move towards mouse pointer or touch
+	APawn* ControlledPawn = GetPawn();
+	if (ControlledPawn != nullptr)
+	{
+		FVector WorlDirection = (CachedDestination - ControlledPawn->GetActorLocation()).GetSafeNormal();
+		ControlledPawn->AddMovementInput(WorlDirection, 1.0, false);
 	}
 }
 
-void AR1PlayerController::Input_Turn(const FInputActionValue& InputValue)
+void AR1PlayerController::OnSetDestinationReleased()
 {
-	float Val = InputValue.Get<float>();
-	AddYawInput(Val);//연구적으로 로테이션의 상태가 PlayerController에 보존된다.
-
-}
-
-void AR1PlayerController::Input_Jump(const FInputActionValue& InputValue)
-{
-
-	if (AR1Character* MyPlayer = Cast<AR1Character>(GetPawn()))
+	// If it was a short press
+	if (FollowTime <= ShortPressThreshold)
 	{
-		MyPlayer->Jump();
+		// We move there and spawn some particles
+		UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, CachedDestination);
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, FXCursor, CachedDestination, FRotator::ZeroRotator, FVector(1.f, 1.f, 1.f), true, true, ENCPoolMethod::None, true);
 	}
-}
 
-void AR1PlayerController::Input_Attack(const FInputActionValue& InputValue)
-{
-	UE_LOG(LogR1, Log, TEXT("Input_Attack"));
-
-	if (AttackMontage)
-	{
-		Cast<AR1Character>(GetPawn())->PlayAnimMontage(AttackMontage);
-	}
+	//FollowTime = 0.f;
 }
