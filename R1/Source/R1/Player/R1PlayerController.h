@@ -19,6 +19,10 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
+	virtual void PlayerTick(float DeltaTime) override;
+
+private:
+	void TickCursorTrace();//몬스터에 마우스가 올라가있는지 추적
 
 private:
 #pragma region 마우스관련
@@ -37,4 +41,13 @@ public:
 private:
 	FVector CachedDestination; //마우스 누른 위치
 	float FollowTime;//마우스 눌린시간
+	bool bMousePressed = false;//마우스클릭하고있는지
+
+protected:
+	UPROPERTY(BlueprintReadOnly)
+	TObjectPtr<class AR1Character> TargetActor;//클릭한 타겟
+
+	UPROPERTY(BlueprintReadOnly)
+	TObjectPtr<class AR1Character> HighlightActor;//하이라이트된 타겟
+
 };

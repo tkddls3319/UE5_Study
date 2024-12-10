@@ -48,17 +48,6 @@ void AR1Player::BeginPlay()
 	Super::BeginPlay();
 
 	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnBeginOverlap);
-
-	//Delegate 테스트
-	//ParsanginDelegate.BindUObject(this, &ThisClass::TestFunc);
-
-	////ParsanginDelegate.Execute();//실행
-	////ParsanginDelegate.Unbind(); 삭제
-
-	//auto h1 = MultiCastDelegate.AddUObject(this, &ThisClass::TestFunc);
-	//MultiCastDelegate.Broadcast();
-	//MultiCastDelegate.Remove(h1);
-	//MultiCastDelegate.RemoveAll();
 }
 
 void AR1Player::Tick(float DeltaTime)

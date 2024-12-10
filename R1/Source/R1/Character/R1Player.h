@@ -7,8 +7,6 @@
 #include "R1Player.generated.h"
 
 DECLARE_DELEGATE(FParsanginDelegate);//파라미터 0
-DECLARE_DELEGATE_OneParam(FParsanginDelegate, int);//파라미터 1
-DECLARE_MULTICAST_DELEGATE(FParsanginMulticastDelegate);
 /**
  * 
  */
@@ -36,11 +34,4 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<class UCameraComponent> Camera;
-
-//public://델리게이트 테스트
-//	UFUNCTION()
-//	void TestFunc(){}
-//
-//	FParsanginDelegate ParsanginDelegate;
-//	FParsanginMulticastDelegate MultiCastDelegate;
 };
