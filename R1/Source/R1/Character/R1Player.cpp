@@ -55,6 +55,16 @@ void AR1Player::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
+void AR1Player::HandleGameplayEvent(FGameplayTag EventTag)
+{
+	AR1PlayerController* PC = Cast<AR1PlayerController>(GetController());
+
+	if (PC)
+	{
+		PC->HandleGameplayEvent(EventTag);
+	}
+}
+
 void AR1Player::OnBeginOverlap( UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 

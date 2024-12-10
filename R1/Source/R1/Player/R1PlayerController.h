@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
 #include "R1Define.h"
+#include "GameplayTagContainer.h"
 #include "R1PlayerController.generated.h"
 
 class UNiagaraSystem;
@@ -22,6 +23,8 @@ protected:
 	virtual void SetupInputComponent() override;
 	virtual void PlayerTick(float DeltaTime) override;
 
+public:
+  void HandleGameplayEvent(FGameplayTag EventTag);
 private:
 	void TickCursorTrace();//몬스터에 마우스가 올라가있는지 추적
 	void ChaseTargetAndAttack();//타겟클릭시 타겟으로 이동

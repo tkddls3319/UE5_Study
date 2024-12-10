@@ -76,6 +76,17 @@ void AR1PlayerController::PlayerTick(float DeltaTime)
 	ChaseTargetAndAttack();
 }
 
+void AR1PlayerController::HandleGameplayEvent(FGameplayTag EventTag)
+{
+	if (EventTag.MatchesTag(R1GameplayTags::Event_Montage_Attack))
+	{
+		if (TargetActor)
+		{
+			TargetActor->OnDamaged(R1Player->FinalDamage, R1Player);
+		}
+	}
+}
+
 void AR1PlayerController::TickCursorTrace()
 {
 	if (bMousePressed)
@@ -141,6 +152,9 @@ void AR1PlayerController::ChaseTargetAndAttack()
 			if (bMousePressed)
 			{
 				/*if(GetCharacter()->GetMesh()->GetAnimInstance()->Montage_IsPlaying(nullptr) == false)*/
+
+				//애니메이션 이벤트 사용전
+				//TargetActor->OnDamaged(R1Player->FinalDamage, R1Player);
 
 				FRotator Rotator = UKismetMathLibrary::FindLookAtRotation(R1Player->GetActorLocation(), TargetActor->GetActorLocation());
 				R1Player->SetActorRotation(Rotator);

@@ -23,6 +23,8 @@ protected:
 
 public:
 	virtual void Tick(float DeltaTime) override;
+
+	virtual void HandleGameplayEvent(FGameplayTag EventTag) override;
 	
 private:
 	UFUNCTION()
