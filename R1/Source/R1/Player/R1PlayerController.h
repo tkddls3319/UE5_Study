@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+#include "R1Define.h"
 #include "R1PlayerController.generated.h"
 
 class UNiagaraSystem;
@@ -23,6 +24,7 @@ protected:
 
 private:
 	void TickCursorTrace();//몬스터에 마우스가 올라가있는지 추적
+	void ChaseTargetAndAttack();//타겟클릭시 타겟으로 이동
 
 private:
 #pragma region 마우스관련
@@ -30,6 +32,9 @@ private:
 	void OnInputStarted();
 	void OnSetDestinationTriggered();
 	void OnSetDestinationReleased();
+
+	ECreatureState GetCreatureState();
+	void SetCreatureState(ECreatureState Instate);
 #pragma endregion
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input)
@@ -50,4 +55,9 @@ protected:
 	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<class AR1Character> HighlightActor;//하이라이트된 타겟
 
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<class UAnimMontage> AttackMontage;
+
+	UPROPERTY(BlueprintReadOnly)
+	TObjectPtr<class AR1Player> R1Player; //내자신
 };

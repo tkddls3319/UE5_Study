@@ -66,13 +66,6 @@ void AR1PlayerController::PlayerTick(float DeltaTime)
 {
 	Super::PlayerTick(DeltaTime);
 	TickCursorTrace();
-
-	//공격 모션 끝났으면 다시 상태값 초기화
-	if (GetCharacter()->GetMesh()->GetAnimInstance()->Montage_IsPlaying(nullptr) == false)
-	{
-		SetCreatureState(ECreatureState::Moving);
-	}
-
 	ChaseTargetAndAttack();
 }
 
