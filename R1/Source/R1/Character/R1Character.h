@@ -35,6 +35,7 @@ public:
 	virtual void OnDamaged(int32 Damage, TObjectPtr<AR1Character> Attacker);
 	virtual void OnDead(TObjectPtr<AR1Character> Attacker);
 
+	void RefreshHpBarRatio();
 
 protected:
 	UPROPERTY(BlueprintReadOnly)
@@ -50,4 +51,8 @@ public:
 	int32 MaxHp = 100;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 FinalDamage = 10;
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<class UWidgetComponent> HpBarComponent;
 };
