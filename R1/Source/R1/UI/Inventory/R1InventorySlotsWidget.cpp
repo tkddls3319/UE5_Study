@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+
 
 
 #include "UI/Inventory/R1InventorySlotsWidget.h"
@@ -6,21 +6,23 @@
 #include "Components/CanvasPanel.h"
 #include "Components/CanvasPanelSlot.h"
 #include "UI/Inventory/R1InventorySlotWidget.h"
-#include "Item/R1InventorySubsystem.h"
 #include "Subsystems/SubsystemBlueprintLibrary.h"
+#include "Item/R1InventorySubsystem.h"
 #include "UI/Inventory/R1InventoryEntryWidget.h"
+#include "UI/Item/Drag/R1DragDropOperation.h"
+#include "R1Define.h"
+
 UR1InventorySlotsWidget::UR1InventorySlotsWidget(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
 {
+
 	ConstructorHelpers::FClassFinder<UR1InventorySlotWidget> FindSlotWidgetClass(TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/UI/Item/Inventory/WBP_InventorySlot.WBP_InventorySlot_C'"));
-	
 	if (FindSlotWidgetClass.Succeeded())
 	{
 		SlotWidgetClass = FindSlotWidgetClass.Class;
 	}
 
 	ConstructorHelpers::FClassFinder<UR1InventoryEntryWidget> FindEntryWidgetClass(TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/UI/Item/Inventory/WBP_InventoryEntry.WBP_InventoryEntry_C'"));
-	
 	if (FindEntryWidgetClass.Succeeded())
 	{
 		EntryWidgetClass = FindEntryWidgetClass.Class;
@@ -30,6 +32,8 @@ UR1InventorySlotsWidget::UR1InventorySlotsWidget(const FObjectInitializer& Objec
 void UR1InventorySlotsWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
+
+
 
 	SlotWidgets.SetNum(X_COUNT * Y_COUNT);
 
@@ -58,9 +62,10 @@ void UR1InventorySlotsWidget::NativeConstruct()
 		OnInventoryEntryChanged(ItemSlotPos, Item);
 	}
 }
-void UR1InventorySlotsWidget::OnInventoryEntryChanged(const FIntPoint& ItemSlotPos, TObjectPtr<UR1ItemInstance> Item)
+
+void UR1InventorySlotsWidget::OnInventoryEntryChanged(const FIntPoint& InItemSlotPos, TObjectPtr<UR1ItemInstance> Item)
 {
-	int32 SlotIndex = ItemSlotPos.Y * X_COUNT + ItemSlotPos.X;
+	int32 SlotIndex = InItemSlotPos.Y * X_COUNT + InItemSlotPos.X;
 
 	if (UR1InventoryEntryWidget* EntryWidget = EntryWidgets[SlotIndex])
 	{
@@ -77,26 +82,63 @@ void UR1InventorySlotsWidget::OnInventoryEntryChanged(const FIntPoint& ItemSlotP
 
 		UCanvasPanelSlot* CanvasPanelSlot = CanvasPanel_Entries->AddChildToCanvas(EntryWidget);
 		CanvasPanelSlot->SetAutoSize(true);
-		CanvasPanelSlot->SetPosition(FVector2D(ItemSlotPos.X * 50, ItemSlotPos.Y * 50));
+		CanvasPanelSlot->SetPosition(FVector2D(InItemSlotPos.X * 50, InItemSlotPos.Y * 50));
 
-		//TODO 테스트용
+		// TODO
 		EntryWidget->Init(this, Item, 1);
 	}
 }
-//
-//bool UR1InventorySlotsWidget::NativeOnDragOver(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
-//{
-//   Super::NativeOnDragOver(InGeometry, InDragDropEvent, InOperation);
-//	return false;
-//}
-//
-//void UR1InventorySlotsWidget::NativeOnDragLeave(const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
-//{
-//	Super::NativeOnDragLeave(InDragDropEvent, InOperation);
-//}
-//
-//bool UR1InventorySlotsWidget::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
-//{
-//	FReplay Replay =  Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
-//	return false;
-//}
+
+bool UR1InventorySlotsWidget::NativeOnDragOver(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
+{
+	Super::NativeOnDragOver(InGeometry, InDragDropEvent, InOperation);
+
+	UR1DragDropOperation* DragDrop = Cast<UR1DragDropOperation>(InOperation);
+	check(DragDrop);
+
+	FVector2D MouseWidgetPos = InGeometry.AbsoluteToLocal(InDragDropEvent.GetScreenSpacePosition());
+	FVector2D ToWidgetPos = MouseWidgetPos - DragDrop->DeltaWidgetPos;
+	FIntPoint ToSlotPos = FIntPoint(ToWidgetPos.X / Item::UnitInventorySlotSize.X, ToWidgetPos.Y / Item::UnitInventorySlotSize.Y);
+
+	if (PrevDragOverSlotPos == ToSlotPos)
+		return true;
+
+	PrevDragOverSlotPos = ToSlotPos;
+
+	// TODO
+
+	return false;
+}
+
+void UR1InventorySlotsWidget::NativeOnDragLeave(const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
+{
+	Super::NativeOnDragLeave(InDragDropEvent, InOperation);
+	FinishDrag();
+}
+
+bool UR1InventorySlotsWidget::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
+{
+	Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
+	FinishDrag();
+
+	UR1DragDropOperation* DragDrop = Cast<UR1DragDropOperation>(InOperation);
+	check(DragDrop);
+
+	FVector2D MouseWidgetPos = InGeometry.AbsoluteToLocal(InDragDropEvent.GetScreenSpacePosition());
+	FVector2D ToWidgetPos = MouseWidgetPos - DragDrop->DeltaWidgetPos;
+	FIntPoint ToItemSlotPos = FIntPoint(ToWidgetPos.X / Item::UnitInventorySlotSize.X, ToWidgetPos.Y / Item::UnitInventorySlotSize.Y);
+
+	// TODO
+	if (DragDrop->FromItemSlotPos != ToItemSlotPos)
+	{
+		OnInventoryEntryChanged(DragDrop->FromItemSlotPos, nullptr);
+		OnInventoryEntryChanged(ToItemSlotPos, DragDrop->ItemInstance);
+	}
+
+	return false;
+}
+
+void UR1InventorySlotsWidget::FinishDrag()
+{
+	PrevDragOverSlotPos = FIntPoint(-1, -1);
+}

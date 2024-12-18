@@ -1,11 +1,10 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "UI/R1UserWidget.h"
 #include "R1InventorySlotsWidget.generated.h"
-
 
 class UR1InventorySlotWidget;
 class UUniformGridPanel;
@@ -30,12 +29,12 @@ protected:
 	virtual void NativeConstruct() override;
 	void OnInventoryEntryChanged(const FIntPoint& ItemSlotPos, TObjectPtr<UR1ItemInstance> Item);
 
-	/*virtual bool NativeOnDragOver(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
+	virtual bool NativeOnDragOver(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
 	virtual void NativeOnDragLeave(const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
-	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;*/
+	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation) override;
 
 private:
-	//void FinishDrag();
+	void FinishDrag();
 
 protected:
 	UPROPERTY()
@@ -62,4 +61,3 @@ private:
 	const int X_COUNT = 10;
 	const int Y_COUNT = 5;
 };
-
