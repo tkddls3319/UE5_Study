@@ -9,6 +9,7 @@
 #include "Components/WidgetComponent.h"
 #include "UI/R1HpBarWidget.h"
 #include "AbilitySystem/R1AbilitySystemComponent.h"
+#include "AbilitySystem/Attributes/R1AttributeSet.h"
 
 // Sets default values
 AR1Character::AR1Character()
@@ -60,7 +61,13 @@ void AR1Character::UnHighlight()
 
 void AR1Character::OnDamaged(int32 Damage, TObjectPtr<AR1Character> Attacker)
 {
+	float Hp = AttributeSet->GetHealth();//GAMEPLAYATTRIBUTE_VALUE_GETTER 메크로를 사용했기 때문에 사용가능한 함수
+	float MaxHp = AttributeSet->GetMaxHealth();
+
+
 	Hp = FMath::Clamp(Hp - Damage, 0, MaxHp);
+	AttributeSet->SetHealth(Hp);
+
 	if (Hp == 0)
 	{
 		OnDead(Attacker);
@@ -80,8 +87,11 @@ void AR1Character::OnDead(TObjectPtr<AR1Character> Attacker)
 
 void AR1Character::RefreshHpBarRatio()
 {
-	if (HpBarComponent)
+	if (HpBarComponent && AttributeSet)
 	{
+		float Hp = AttributeSet->GetHealth();//GAMEPLAYATTRIBUTE_VALUE_GETTER 메크로를 사용했기 때문에 사용가능한 함수
+		float MaxHp = AttributeSet->GetMaxHealth();
+
 		float Ratio = static_cast<float>(Hp) / MaxHp;
 
 		UR1HpBarWidget* HpBar = Cast<UR1HpBarWidget>(HpBarComponent->GetUserWidgetObject());

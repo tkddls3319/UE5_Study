@@ -8,6 +8,7 @@
 #include "R1PlayerState.generated.h"
 
 class UR1AbilitySystemComponent;
+class UR1PlayerSet;
 /**
  * 
  */
@@ -19,12 +20,17 @@ class R1_API AR1PlayerState : public APlayerState, public IAbilitySystemInterfac
 public:
 	AR1PlayerState(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 	
-
 public:
 	// IAbilitySystemInterface을(를) 통해 상속됨
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
+	UR1AbilitySystemComponent* GetR1AbilitySystemComponent() const;
+	UR1PlayerSet* GetR1PlayerSet() const;
+
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TObjectPtr<class UR1AbilitySystemComponent> AbilitySystemComponent;
+	TObjectPtr<UR1AbilitySystemComponent> AbilitySystemComponent;
+
+	UPROPERTY()
+	TObjectPtr<UR1PlayerSet> PlayerSet;
 };
