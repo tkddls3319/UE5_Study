@@ -8,6 +8,8 @@
 #include "R1Define.h"
 #include "Components/WidgetComponent.h"
 #include "UI/R1HpBarWidget.h"
+#include "AbilitySystem/R1AbilitySystemComponent.h"
+
 // Sets default values
 AR1Character::AR1Character()
 {
@@ -15,7 +17,6 @@ AR1Character::AR1Character()
 
 	HpBarComponent = CreateDefaultSubobject< UWidgetComponent>(TEXT("HealthBar"));
 	HpBarComponent->SetupAttachment(GetRootComponent());
-
 
 	ConstructorHelpers::FClassFinder<UUserWidget> HealthBarWidgetClass(TEXT("/Script/UMGEditor.WidgetBlueprint'/Game/Blueprint/UI/WBP_HpBar.WBP_HpBar_C'"));
 	if(HealthBarWidgetClass.Succeeded())
@@ -86,5 +87,14 @@ void AR1Character::RefreshHpBarRatio()
 		UR1HpBarWidget* HpBar = Cast<UR1HpBarWidget>(HpBarComponent->GetUserWidgetObject());
 		HpBar->SetHpRatio(Ratio);
 	}
+}
+
+UAbilitySystemComponent* AR1Character::GetAbilitySystemComponent() const
+{
+	return AbilitySystemComponent;
+}
+
+void AR1Character::InitAbilitySystem()
+{
 }
 

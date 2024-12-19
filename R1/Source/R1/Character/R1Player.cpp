@@ -10,7 +10,8 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
-
+#include "AbilitySystem/R1AbilitySystemComponent.h"	
+#include "Player/R1PlayerState.h"
 
 AR1Player::AR1Player()
 {
@@ -19,13 +20,11 @@ AR1Player::AR1Player()
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
 
-
 	//캐릭터가 이동할 때 MoveMentController의 회전값으로 변경
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 
 	//어느 속도로 MoveMentController 회전값으로 이동할지
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 640.f, 0.f);
-
 
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	SpringArm->SetupAttachment(GetCapsuleComponent());
@@ -48,6 +47,23 @@ void AR1Player::BeginPlay()
 	Super::BeginPlay();
 
 	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnBeginOverlap);
+}
+
+void AR1Player::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+	InitAbilitySystem();
+}
+
+void AR1Player::InitAbilitySystem()
+{
+	Super::InitAbilitySystem();
+
+	if (AR1PlayerState* PS = GetPlayerState<AR1PlayerState>())
+	{
+		AbilitySystemComponent = Cast<UR1AbilitySystemComponent>(PS->GetAbilitySystemComponent());
+		AbilitySystemComponent->InitAbilityActorInfo(PS, this);
+	}
 }
 
 void AR1Player::Tick(float DeltaTime)

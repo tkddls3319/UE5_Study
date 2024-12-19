@@ -21,10 +21,12 @@ public class R1 : ModuleRules
 			"InputCore", 
 			"EnhancedInput" ,
 			"GameplayTags",
-			"NavigationSystem",
+			"GameplayTasks",
+			"GameplayAbilities",
+            "NavigationSystem",
             "AIModule",
             "Niagara",
-			"UMG"
+			"UMG",
         });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });

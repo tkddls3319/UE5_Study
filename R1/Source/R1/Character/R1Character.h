@@ -7,10 +7,11 @@
 #include "Interface/R1HighlightInterface.h"
 #include "R1Define.h"
 #include "GameplayTagContainer.h"
+#include "AbilitySystemInterface.h"
 #include "R1Character.generated.h"
 
 UCLASS()
-class R1_API AR1Character : public ACharacter, public IR1HighlightInterface
+class R1_API AR1Character : public ACharacter, public IR1HighlightInterface, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
 
@@ -37,6 +38,11 @@ public:
 
 	void RefreshHpBarRatio();
 
+public:
+	// IAbilitySystemInterface을(를) 통해 상속됨
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+	virtual void InitAbilitySystem();
+
 protected:
 	UPROPERTY(BlueprintReadOnly)
 	bool bHighlighted = true;
@@ -55,4 +61,8 @@ public:
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<class UWidgetComponent> HpBarComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<class UR1AbilitySystemComponent> AbilitySystemComponent;
+
 };
