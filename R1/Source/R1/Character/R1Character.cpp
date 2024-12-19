@@ -34,6 +34,8 @@ void AR1Character::BeginPlay()
 {
 	Super::BeginPlay();
 	RefreshHpBarRatio();
+
+	AddCharacterAbilities();
 }
 
 // Called every frame
@@ -104,7 +106,18 @@ UAbilitySystemComponent* AR1Character::GetAbilitySystemComponent() const
 	return AbilitySystemComponent;
 }
 
-void AR1Character::InitAbilitySystem()
+void AR1Character::InitAbilitySystem(){}
+
+void AR1Character::AddCharacterAbilities()
 {
+	UR1AbilitySystemComponent* ASC = Cast<UR1AbilitySystemComponent>(AbilitySystemComponent);
+
+	if (ASC == nullptr)
+	{
+		return;
+	}
+
+
+	ASC->AddCharacterAbilities(StartupAbilities);
 }
 

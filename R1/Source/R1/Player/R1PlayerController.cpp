@@ -159,7 +159,8 @@ void AR1PlayerController::ChaseTargetAndAttack()
 				FRotator Rotator = UKismetMathLibrary::FindLookAtRotation(R1Player->GetActorLocation(), TargetActor->GetActorLocation());
 				R1Player->SetActorRotation(Rotator);
 
-				GetCharacter()->PlayAnimMontage(AttackMontage);
+				R1Player->ActivateAbility(R1GameplayTags::Ability_Attack);
+				
 				SetCreatureState(ECreatureState::Skill);
 
 				TargetActor = HighlightActor;

@@ -13,6 +13,7 @@
 #include "AbilitySystem/R1AbilitySystemComponent.h"	
 #include "Player/R1PlayerState.h"
 #include "AbilitySystem/Attributes/R1PlayerSet.h"
+
 AR1Player::AR1Player()
 {
 	//캐릭터가 카메라 회전에 의해 MoveMentController에 영향을 받지 않게
@@ -98,4 +99,9 @@ void AR1Player::OnBeginOverlap( UPrimitiveComponent* OverlappedComponent, AActor
 {
 
 	UE_LOG(LogTemp, Log, TEXT("OnBeginOverlap!!"));
+}
+
+void AR1Player::ActivateAbility(FGameplayTag AbilityTag)
+{
+	AbilitySystemComponent->ActivateAbility(AbilityTag);
 }

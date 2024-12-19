@@ -13,5 +13,13 @@ UCLASS()
 class R1_API UR1AbilitySystemComponent : public UAbilitySystemComponent
 {
 	GENERATED_BODY()
-	
+
+public:
+
+public:
+	void AddCharacterAbilities(const TArray<TSubclassOf<class UGameplayAbility>>& StartupAbilities);
+
+	void ActivateAbility(FGameplayTag AbilityTag);
+
+	TArray<FGameplayAbilitySpecHandle> SpecHandles;
 };
